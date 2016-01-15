@@ -150,18 +150,22 @@ def _validate_headers(expected_headers, included_headers):
         raise CSVError("Invalid CSV File: " + msg)
 
 
-def _parse_csv(file, csv_mappings, validate=False, **kwargs):
-    results = []
+def _parse_csv(file, csv_mappings=None, validate=False, **kwargs):
     headers, rows = _load_csv(file)
     if validate:
         _validate_headers([c.csv_name for c in csv_mappings], headers)
 
-    for row in rows:
-        attributes = []
-        for csv_mapping in csv_mappings:
-            attributes += csv_mapping.values_for(row.get(csv_mapping.csv_name))
-        record = store(dict(attributes))
-        results.append(record)
+    if not csv_mappings:
+        results = rows
+    else:
+        results = []
+        for row in rows:
+            attributes = []
+            for csv_mapping in csv_mappings:
+                raw_value = row.get(csv_mapping.csv_name)
+                attributes += csv_mapping.values_for(raw_value)
+            record = store(dict(attributes))
+            results.append(record)
 
     skip_if = kwargs.get("skip_if", None)
     if skip_if:
@@ -179,7 +183,7 @@ def _parse_csv(file, csv_mappings, validate=False, **kwargs):
     return results
 
 
-def parse_csv_data(data, csv_mappings, validate=False, **kwargs):
+def parse_csv_data(data, csv_mappings=None, validate=False, **kwargs):
     try:
         encoded = data if isinstance(data, unicode) else unicode(data)
     except UnicodeDecodeError:
@@ -190,7 +194,7 @@ def parse_csv_data(data, csv_mappings, validate=False, **kwargs):
     return _parse_csv(f, csv_mappings, validate, **kwargs)
 
 
-def parse_csv(filepath, csv_mappings, validate=False, **kwargs):
+def parse_csv(filepath, csv_mappings=None, validate=False, **kwargs):
     def parse_and_encode(encoding):
         with codecs.open(filepath, 'r', encoding) as f:
             return _parse_csv(f, csv_mappings, validate, **kwargs)

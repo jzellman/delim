@@ -49,6 +49,23 @@ def test_validate_on_duplicates():
     assert_true("duplicate rows with name: 1", cm.exception.message)
 
 
+def test_parse_csv_data_no_mappings():
+    data = "Name,Bar\n1,2\n3,4"
+    results = delim.parse_csv_data(data)
+    assert_equals(2, len(results))
+    assert_equals("1", results[0]['Name'])
+    assert_equals("2", results[0]['Bar'])
+
+
+def test_parse_csv_data_mappings():
+    data = "Name,Bar\n1,2\n3,4"
+    fields = [delim.CSVField('Name'), delim.CSVField('Bar')]
+    results = delim.parse_csv_data(data, fields)
+    assert_equals(2, len(results))
+    assert_equals("1", results[0].name)
+    assert_equals("2", results[0].bar)
+
+
 def test_skip_blank_ones():
     data = "Name,Bar\n,,\n\n1,2\n,,\n\n"
     fields = [delim.CSVField('Name'), delim.CSVField('Bar')]
@@ -61,18 +78,18 @@ def test_skip_blank_ones():
 
 def test_parse_csv():
     # utf-8
-    delim.parse_csv('tests/utf8.csv', [])
+    delim.parse_csv('tests/utf8.csv')
     # iso8859
-    delim.parse_csv('tests/win_encoded.csv', [])
+    delim.parse_csv('tests/win_encoded.csv')
 
 
 def test_parse_csv_data():
     # utf-8
     with codecs.open('tests/utf8.csv', 'r', 'utf-8') as f:
-        delim.parse_csv_data(f.read(), [])
+        delim.parse_csv_data(f.read())
     # iso8859
     with codecs.open('tests/win_encoded.csv', 'r', 'iso8859') as f:
-        delim.parse_csv_data(f.read(), [])
+        delim.parse_csv_data(f.read())
 
 
 def test_boolean_csv():
