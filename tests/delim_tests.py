@@ -91,6 +91,13 @@ def test_parse_csv_data():
     with codecs.open('tests/win_encoded.csv', 'r', 'iso8859') as f:
         delim.parse_csv_data(f.read())
 
+    # Open the files naively, much like it was coming from a web server.
+    with open('tests/win_encoded.csv', 'r') as f:
+        delim.parse_csv_data(f.read())
+
+    with open('tests/utf8.csv', 'r') as f:
+        delim.parse_csv_data(f.read())
+
 
 def test_boolean_csv():
     f = delim.BooleanCSVField('foo', 'foo_type')

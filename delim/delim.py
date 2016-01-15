@@ -1,5 +1,4 @@
 import io
-import logging
 import codecs
 import csv
 import cStringIO
@@ -187,7 +186,6 @@ def parse_csv_data(data, csv_mappings=None, validate=False, **kwargs):
     try:
         encoded = data if isinstance(data, unicode) else unicode(data)
     except UnicodeDecodeError:
-        logging.error(u"Could not convert to unicode: %s" % data)
         encoded = unicode(data, "iso8859")
 
     f = io.StringIO(encoded)
