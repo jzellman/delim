@@ -53,8 +53,7 @@ def test_parse_csv_data_no_mappings():
     data = "Name,Bar\n1,2\n3,4"
     results = delim.parse_csv_data(data)
     assert_equals(2, len(results))
-    assert_equals("1", results[0]['Name'])
-    assert_equals("2", results[0]['Bar'])
+    assert_equals([("Name", "1"), ("Bar", "2")], results[0])
 
 
 def test_parse_csv_data_mappings():

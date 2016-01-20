@@ -125,14 +125,14 @@ def _load_csv(file):
     if not rows:
         raise CSVError("CSV appears to be empty")
     header = rows.pop(0)
-    return header, [dict(zip(header, row)) for row in rows]
+    return header, [zip(header, row) for row in rows]
 
 
 class CSVError(StandardError):
     pass
 
 
-def _validate_headers(expected_headers, included_headers):
+def _validate_header(expected_header, included_header):
     def format_message(detail, header_names):
         joined = ", ".join(header_names)
         if joined:
@@ -140,25 +140,26 @@ def _validate_headers(expected_headers, included_headers):
         else:
             return ""
 
-    expected_headers = set(expected_headers)
-    included_headers = set(included_headers)
+    expected_header = set(expected_header)
+    included_header = set(included_header)
 
-    msg = format_message("missing", expected_headers - included_headers)
-    msg += format_message("unknown", included_headers - expected_headers)
+    msg = format_message("missing", expected_header - included_header)
+    msg += format_message("unknown", included_header - expected_header)
     if msg:
         raise CSVError("Invalid CSV File: " + msg)
 
 
 def _parse_csv(file, csv_mappings=None, validate=False, **kwargs):
-    headers, rows = _load_csv(file)
+    header, rows = _load_csv(file)
     if validate:
-        _validate_headers([c.csv_name for c in csv_mappings], headers)
+        _validate_header([c.csv_name for c in csv_mappings], header)
 
     if not csv_mappings:
         results = rows
     else:
         results = []
         for row in rows:
+            row = dict(row)
             attributes = []
             for csv_mapping in csv_mappings:
                 raw_value = row.get(csv_mapping.csv_name)
