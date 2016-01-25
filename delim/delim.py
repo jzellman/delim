@@ -207,12 +207,24 @@ def snake_to_title(w):
     return u" ".join(p.title() for p in w.split("_"))
 
 
-def build_csv(recs, fields):
+def build_csv(recs, fields=None):
+    def enc(d):
+        try:
+            return unicode(d).encode('utf-8')
+        except UnicodeDecodeError:
+            return unicode(d, 'iso8859').encode('utf-8')
+
+    import cStringIO
+    import csv
+    if fields:
+        header = [snake_to_title(field) for field in fields]
+        recs = [[getattr(rec, field) for field in fields] for rec in recs]
+        recs = [header] + recs
+
     f = cStringIO.StringIO()
     writer = csv.writer(f)
-    header = [snake_to_title(field) for field in fields]
-    writer.writerow(header)
-    for rec in recs:
-        writer.writerow([getattr(rec, field) for field in fields])
+    for row in recs:
+        row = [enc(v) for v in row]
+        writer.writerow(row)
     f.seek(0)
     return f.read()

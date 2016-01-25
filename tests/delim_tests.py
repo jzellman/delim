@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-15 -*-
 import codecs
 
 from nose.tools import assert_equals, assert_raises, assert_true
@@ -11,12 +12,25 @@ class Row:
             setattr(self, key, value)
 
 
-def test_build_csv():
+def test_build_csv_with_fields():
     recs = [Row(full_name="foo", id=1, blah=False),
             Row(full_name="bar", id=2, blah=False),
             Row(full_name="baz", id=3, blah=True)]
     result = delim.build_csv(recs, ['id', 'full_name'])
     assert_equals("Id,Full Name\r\n1,foo\r\n2,bar\r\n3,baz\r\n", result)
+
+
+def test_build_csv_no_fields():
+    recs = [(1, 'foo'), (2, 'bar'), (3, 'baz')]
+    result = delim.build_csv(recs)
+    assert_equals("1,foo\r\n2,bar\r\n3,baz\r\n", result)
+
+
+def test_build_csv_encodings():
+    recs = [('café',1)]
+    result = delim.build_csv(recs)
+    expected = unicode("café,1\r\n", "iso8859").encode("utf-8")
+    assert_equals(expected, result)
 
 
 def test_validate_csv_unknown_columns():
