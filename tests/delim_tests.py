@@ -27,7 +27,7 @@ def test_build_csv_no_fields():
 
 
 def test_build_csv_encodings():
-    recs = [('café',1)]
+    recs = [('café', 1)]
     result = delim.build_csv(recs)
     expected = unicode("café,1\r\n", "iso8859").encode("utf-8")
     assert_equals(expected, result)

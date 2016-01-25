@@ -1,7 +1,6 @@
 import io
 import codecs
 import csv
-import cStringIO
 
 from collections import Counter
 
